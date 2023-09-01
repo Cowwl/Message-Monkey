@@ -1,5 +1,5 @@
 import React from "react";
-import { Div, Text, Button, Input } from "atomize";
+import { Div, Text, Button, Input, Icon } from "atomize";
 
 const Dashboard = () => {
   const [selectedChat, setSelectedChat] = React.useState(null);
@@ -7,23 +7,23 @@ const Dashboard = () => {
 
   const chats = [
     {
-      name: "Alice",
+      name: "Alice Doe",
       email: "alice@example.com",
       avatar: "https://i.pravatar.cc/150?img=1",
       messages: [
-        { sender: "Alice", text: "Hi there!" },
+        { sender: "Alice Doe", text: "Hi there!" },
         { sender: "You", text: "Hello!" },
-        { sender: "Alice", text: "How are you?" },
+        { sender: "Alice Doe", text: "How are you?" },
       ],
     },
     {
-      name: "Bob",
+      name: "Bob Smith",
       email: "bob@example.com",
       avatar: "https://i.pravatar.cc/150?img=2",
       messages: [
-        { sender: "Bob", text: "Hey!" },
+        { sender: "Bob Smith", text: "Hey!" },
         { sender: "You", text: "Hi Bob!" },
-        { sender: "Bob", text: "What's up?" },
+        { sender: "Bob Smith", text: "What's up?" },
       ],
     },
   ];
@@ -54,16 +54,21 @@ const Dashboard = () => {
         flexDir="column"
         border="1px solid"
         borderColor="gray200"
-        w="15%"
+        w="20%"
         h="100%"
       >
         <Div
+          d="flex"
           border={{ b: "0.5px solid" }}
           borderColor="gray500"
           p="1rem"
           shadow="2"
+          flexDir="row"
+          align="center"
+          justify="flex-start"
           h="8%"
         >
+          <Icon name="Menu" size="20px" m={{ r: "1rem" }} />
           <Text
             fontFamily="Poppins"
             textWeight="800"
@@ -72,7 +77,7 @@ const Dashboard = () => {
             textColor="info700"
             textSize="title"
           >
-            Chats
+            Conversations
           </Text>
         </Div>
         {chats.map((chat, index) => (
@@ -97,15 +102,15 @@ const Dashboard = () => {
         flex="1"
         border="1px solid"
         borderColor="gray200"
-        w="100%"
+        w="60%"
         h="100%"
-        bg="gray200"
+        bg="gray300"
       >
         <Div d="flex" flexDir="column" h="100%">
           <Div
             d="flex"
             flexDir="row"
-            justify="center"
+            justify="flex-start"
             p="1rem"
             h="8%"
             bg="white"
@@ -115,7 +120,8 @@ const Dashboard = () => {
             align="center"
           >
             <Text
-              textAlign="center"
+              m={{ l: "1rem" }}
+              textAlign="flex-start"
               textColor="info700"
               fontFamily="Poppins"
               textWeight="800"
@@ -163,7 +169,7 @@ const Dashboard = () => {
           <Div d="flex" flexDir="row" p="1rem" w="100%" justify="space-between">
             <Input
               placeholder="Type a message..."
-              w="70vw"
+              w="100%"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={(e) => {
@@ -182,34 +188,25 @@ const Dashboard = () => {
         flexDir="column"
         border="1px solid"
         borderColor="gray200"
-        w="15%"
         h="100%"
+        w="20%"
+        bg="gray400"
       >
         <Div
           d="flex"
           border={{ b: "0.5px solid" }}
           borderColor="gray500"
           shadow="2"
-          h="8%"
+          h="auto"
+          flexDir="column"
           p="1rem"
           align="center"
           justify="center"
+          bg="white"
         >
-          <Text
-            fontFamily="Poppins"
-            textSize="title"
-            textWeight="800"
-            p="1rem"
-            textAlign="center"
-            textColor="info700"
-          >
-            Profile
-          </Text>
-        </Div>
-        <Div d="flex" flexDir="column" align="center">
           <div
             style={{
-              width: "80%",
+              width: "20%",
               height: "auto",
               borderRadius: "50%",
               overflow: "hidden",
@@ -222,20 +219,65 @@ const Dashboard = () => {
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           </div>
+          <Text
+            fontFamily="Poppins"
+            textSize="title"
+            textWeight="800"
+            p="1rem"
+            textAlign="center"
+            textColor="#212121"
+          >
+            {selectedChat?.name}
+          </Text>
+          {/* Add a call and profile icon side by side */}
+          <Div d="flex" w="100%" justify="space-around">
+            <Button
+              bg="info700"
+              hoverBg="info800"
+              textColor="white"
+              shadow="3"
+              hoverShadow="4"
+              justify="space-around"
+              align="center"
+              w="40%"
+            >
+              <Icon name="Add" color="white" size="20px" />
+              Call
+            </Button>
+            <Button
+              bg="info700"
+              hoverBg="info800"
+              textColor="white"
+              shadow="3"
+              hoverShadow="4"
+              justify="space-around"
+              align="center"
+              w="40%"
+            >
+              <Icon name="User" color="white" size="20px" />
+              Profile
+            </Button>
+          </Div>
+        </Div>
+        <Div d="flex" flexDir="column" align="center">
           <Div
             bg="white"
+            m="1rem"
             p="1rem"
             shadow="2"
             rounded="lg"
             align="center"
             justify="center"
-            w="80%"
+            w="90%"
           >
-            <Text tag="h5" p={{ y: "0.5rem" }} textAlign="center">
-              {selectedChat?.name}
+            <Text p={{ y: "0.5rem" }} textAlign="center" textWeight="600">
+              Customer Details
             </Text>
-            <Text tag="p" p={{ y: "0.5rem" }} textAlign="center">
-              {selectedChat?.email}
+            <Text p={{ y: "0.5rem" }} textAlign="center">
+              Name: {selectedChat?.name}
+            </Text>
+            <Text p={{ y: "0.5rem" }} textAlign="center">
+              Email: {selectedChat?.email}
             </Text>
           </Div>
         </Div>
