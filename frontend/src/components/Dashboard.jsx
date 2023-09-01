@@ -1,5 +1,5 @@
 import React from "react";
-import { Div, Text, Button, Input } from "react-atomize";
+import { Div, Text, Button, Input } from "atomize";
 
 const Dashboard = () => {
   const [selectedChat, setSelectedChat] = React.useState(null);
@@ -8,6 +8,8 @@ const Dashboard = () => {
   const chats = [
     {
       name: "Alice",
+      email: "alice@example.com",
+      avatar: "https://i.pravatar.cc/150?img=1",
       messages: [
         { sender: "Alice", text: "Hi there!" },
         { sender: "You", text: "Hello!" },
@@ -16,6 +18,8 @@ const Dashboard = () => {
     },
     {
       name: "Bob",
+      email: "bob@example.com",
+      avatar: "https://i.pravatar.cc/150?img=2",
       messages: [
         { sender: "Bob", text: "Hey!" },
         { sender: "You", text: "Hi Bob!" },
@@ -53,68 +57,113 @@ const Dashboard = () => {
         w="15%"
         h="100%"
       >
-        <Text tag="h4" p="1rem" textAlign="center" textColor="info700">
-          Chats
-        </Text>
+        <Div
+          border={{ b: "0.5px solid" }}
+          borderColor="gray500"
+          p="1rem"
+          shadow="2"
+          h="8%"
+        >
+          <Text
+            fontFamily="Poppins"
+            textWeight="800"
+            p="0.5rem"
+            textAlign="center"
+            textColor="info700"
+            textSize="title"
+          >
+            Chats
+          </Text>
+        </Div>
         {chats.map((chat, index) => (
           <Button
             key={index}
             onClick={() => {
               setSelectedChat(chat);
             }}
+            m={{ t: "0.5rem" }}
             w="100%"
-            rounded="0"
             bg="white"
             textColor="black"
-            hoverTextColor="white"
+            hoverShadow="3"
             hoverBg="info700"
+            hoverTextColor="white"
           >
             {chat.name}
           </Button>
         ))}
       </Div>
-      <Div flex="1" border="1px solid" borderColor="gray200" w="100%" h="100%">
-        <Div p="1rem" d="flex" flexDir="column" h="100%">
-          <Text tag="h4" textAlign="center" textColor="info700">
-            {selectedChat?.name}
-          </Text>
-          <Div overflowY="auto" overflowX ="hidden" flex="1">
-            {selectedChat?.messages.map((message, index) => (
-              <Div key={index} d="flex" flexDir="column" m={{ b: "1rem" }}>
-                {/* handle overflow in the chat bubble */}
-                <Text
-                  p={{ x: "0.5rem", y: "0.2rem" }}
-                  textAlign={message.sender === "You" ? "right" : "left"}
-                  textColor={message.sender === "You" ? "info700" : "black"}
-                >
-                  {message.sender}
-                </Text>
-                {/* // Position the message to the right if it is sent by me */}
-                <Div
-                  d="flex"
-                  m={{ l: message.sender === "You" ? "auto" : "0" }}
-                  overflowWrap={"break-word"}
-                  overflowX={"hidden"}
-                >
+      <Div
+        flex="1"
+        border="1px solid"
+        borderColor="gray200"
+        w="100%"
+        h="100%"
+        bg="gray200"
+      >
+        <Div d="flex" flexDir="column" h="100%">
+          <Div
+            d="flex"
+            flexDir="row"
+            justify="center"
+            p="1rem"
+            h="8%"
+            bg="white"
+            border={{ b: "0.5px solid" }}
+            borderColor="gray500"
+            shadow="2"
+            align="center"
+          >
+            <Text
+              textAlign="center"
+              textColor="info700"
+              fontFamily="Poppins"
+              textWeight="800"
+              textSize="title"
+            >
+              {selectedChat?.name}
+            </Text>
+          </Div>
+          <Div p="1rem" flex="1">
+            <Div overflowY="auto" overflowX="hidden" flex="1">
+              {selectedChat?.messages.map((message, index) => (
+                <Div key={index} d="flex" flexDir="column" m={{ b: "1rem" }}>
+                  {/* handle overflow in the chat bubble */}
                   <Text
-                    p={{ x: "1rem", y: "0.5rem" }}
-                    w={{ max: "70%" }}
+                    p={{ x: "0.5rem", y: "0.2rem" }}
+                    textAlign={message.sender === "You" ? "right" : "left"}
+                    textColor={message.sender === "You" ? "info700" : "black"}
+                  >
+                    {message.sender}
+                  </Text>
+                  {/* // Position the message to the right if it is sent by me */}
+                  <Div
+                    d="flex"
+                    m={{ l: message.sender === "You" ? "auto" : "0" }}
                     overflowWrap={"break-word"}
                     overflowX={"hidden"}
-                    bg={message.sender === "You" ? "info700" : "gray200"}
-                    textColor={message.sender === "You" ? "white" : "black"}
-                    rounded="lg"
                   >
-                    {message.text}
-                  </Text>
+                    <Text
+                      p={{ x: "1rem", y: "0.5rem" }}
+                      w={{ max: "70%" }}
+                      shadow="3"
+                      rounded="lg"
+                      overflowWrap={"break-word"}
+                      overflowX={"hidden"}
+                      bg={message.sender === "You" ? "info700" : "white"}
+                      textColor={message.sender === "You" ? "white" : "black"}
+                    >
+                      {message.text}
+                    </Text>
+                  </Div>
                 </Div>
-              </Div>
-            ))}
+              ))}
+            </Div>
           </Div>
-          <Div d="flex" flexDir="row" p="1rem" w="100%" bg="gray300">
+          <Div d="flex" flexDir="row" p="1rem" w="100%" justify="space-between">
             <Input
               placeholder="Type a message..."
-              m={{ r: "1rem" }}
+              w="70vw"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={(e) => {
@@ -127,8 +176,71 @@ const Dashboard = () => {
           </Div>
         </Div>
       </Div>
+      {/* Right sidebar with profile details */}
+      <Div
+        d="flex"
+        flexDir="column"
+        border="1px solid"
+        borderColor="gray200"
+        w="15%"
+        h="100%"
+      >
+        <Div
+          d="flex"
+          border={{ b: "0.5px solid" }}
+          borderColor="gray500"
+          shadow="2"
+          h="8%"
+          p="1rem"
+          align="center"
+          justify="center"
+        >
+          <Text
+            fontFamily="Poppins"
+            textSize="title"
+            textWeight="800"
+            p="1rem"
+            textAlign="center"
+            textColor="info700"
+          >
+            Profile
+          </Text>
+        </Div>
+        <Div d="flex" flexDir="column" align="center">
+          <div
+            style={{
+              width: "80%",
+              height: "auto",
+              borderRadius: "50%",
+              overflow: "hidden",
+              margin: "1rem auto",
+            }}
+          >
+            <img
+              src={selectedChat?.avatar}
+              alt={selectedChat?.name}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </div>
+          <Div
+            bg="white"
+            p="1rem"
+            shadow="2"
+            rounded="lg"
+            align="center"
+            justify="center"
+            w="80%"
+          >
+            <Text tag="h5" p={{ y: "0.5rem" }} textAlign="center">
+              {selectedChat?.name}
+            </Text>
+            <Text tag="p" p={{ y: "0.5rem" }} textAlign="center">
+              {selectedChat?.email}
+            </Text>
+          </Div>
+        </Div>
+      </Div>
     </Div>
   );
 };
-
 export default Dashboard;
