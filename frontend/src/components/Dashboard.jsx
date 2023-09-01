@@ -1,52 +1,101 @@
 import React from "react";
 import { Div, Text, Button, Input, Icon } from "atomize";
+import axios from "axios";
 
 const Dashboard = () => {
   const [selectedChat, setSelectedChat] = React.useState(null);
   const [inputText, setInputText] = React.useState("");
+  const [chats, setChats] = React.useState([]);
 
-  const chats = [
-    {
-      name: "Alice Doe",
-      email: "alice@example.com",
-      avatar: "https://i.pravatar.cc/150?img=1",
-      messages: [
-        { sender: "Alice Doe", text: "Hi there!" },
-        { sender: "You", text: "Hello!" },
-        { sender: "Alice Doe", text: "How are you?" },
-      ],
-    },
-    {
-      name: "Bob Smith",
-      email: "bob@example.com",
-      avatar: "https://i.pravatar.cc/150?img=2",
-      messages: [
-        { sender: "Bob Smith", text: "Hey!" },
-        { sender: "You", text: "Hi Bob!" },
-        { sender: "Bob Smith", text: "What's up?" },
-      ],
-    },
-  ];
+  React.useEffect(() => {
+    axios
+      .get("https://f20202144-04ese3g34v1w0cji.socketxp.com/getmessages")
+      .then((response) => {
+        const data = response.data;
+        const formattedChats = data.map((chat) => ({
+          name: `${chat.sender_first_name} ${chat.sender_last_name}`,
+          senderID: chat.sender_id,
+          avatar: `https://i.pravatar.cc/150?u=${chat.sender_id}`,
+          messages: [
+            {
+              sender: `${chat.sender_first_name} ${chat.sender_last_name}`,
+              text: chat.message,
+              timestamp: chat.timestamp,
+            },
+          ],
+        }));
+        setChats(formattedChats);
+      });
+  }, []);
+  // Write a function to parse UTC epoch to a readable format
+  const formatDate = (epoch) => {
+    var date = new Date(epoch * 1000);
+    return date.toLocaleString();
+  };
+
+  // get messages for the current active chat by using the sender id and the getmessagesforsender endpoint and display them
+  React.useEffect(() => {
+    if (selectedChat) {
+      getMessagesFromID(selectedChat.senderID);
+    }
+  }, [selectedChat]);
 
   React.useEffect(() => {
     if (chats.length > 0) {
       setSelectedChat(chats[0]);
     }
-  }, []);
-
+  }, [chats]);
+  //  Call the sendmessage endpoint with the input text and the selected chat sender id
+  // pass the timestamp as a UNIX epoch
   const handleSendMessage = () => {
-    if (inputText.trim() !== "") {
-      setSelectedChat((prevSelectedChat) => ({
-        ...prevSelectedChat,
-        messages: [
-          ...prevSelectedChat.messages,
-          { sender: "You", text: inputText.trim() },
-        ],
-      }));
-      setInputText("");
+    if (inputText !== "") {
+      axios
+        .post("https://f20202144-04ese3g34v1w0cji.socketxp.com/sendmessage", {
+          sender_id: selectedChat.senderID,
+          message: inputText,
+          timestamp: Math.floor(Date.now() * 1000),
+        })
+        .then((response) => {
+          const data = response.data;
+          const formattedChats = chats.map((chat) => {
+            if (chat.senderID === selectedChat.senderID) {
+              chat.messages.push({
+                sender: "You",
+                text: inputText,
+                timestamp: Math.floor(Date.now()),
+              });
+            }
+            return chat;
+          });
+          setChats(formattedChats);
+          setInputText("");
+        });
     }
   };
-
+  // Call the getmessagesforsender endpoint with the selected chat sender id
+  const getMessagesFromID = (senderID) => {
+    axios
+      .post(
+        "https://f20202144-04ese3g34v1w0cji.socketxp.com/getmessagesforsender",
+        {
+          sender_id: senderID,
+        }
+      )
+      .then((response) => {
+        const data = response.data;
+        const formattedChats = chats.map((chat) => {
+          if (chat.senderID === senderID) {
+            chat.messages = data.map((message) => ({
+              sender: `${message.sender_first_name} ${message.sender_last_name}`,
+              text: message.message,
+              timestamp: message.timestamp,
+            }));
+          }
+          return chat;
+        });
+        setChats(formattedChats);
+      });
+  };
   return (
     <Div d="flex" h="100vh">
       {/* Create a small left sidebar with a logout button at the bottom */}
@@ -136,6 +185,7 @@ const Dashboard = () => {
             <Icon name="Refresh" size="20px" m={{ l: "auto" }} />
           </Button>
         </Div>
+        {/* Show chats from the same sender only once */}
         {chats.map((chat, index) => (
           <Button
             key={index}
@@ -218,6 +268,14 @@ const Dashboard = () => {
                       {message.text}
                     </Text>
                   </Div>
+                  {/* Show the time */}
+                  <Text
+                    p={{ x: "0.5rem", y: "0.2rem" }}
+                    textAlign={message.sender === "You" ? "right" : "left"}
+                    textColor={message.sender === "You" ? "#17486a" : "black"}
+                  >
+                    {formatDate(message.timestamp/1000)}
+                  </Text>
                 </Div>
               ))}
             </Div>
@@ -383,8 +441,8 @@ const Dashboard = () => {
               textColor="#212121"
               p="0.5rem"
             >
-              {/* print email */}
-              Email: {selectedChat?.email}
+              {/* print senderID */}
+              senderID: {selectedChat?.senderID}
             </Text>
           </Div>
         </Div>

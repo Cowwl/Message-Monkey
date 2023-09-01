@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "atomize": "^1.0.28",
     "axios": "^1.5.0",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-atomize": "^1.0.33",
     "react-dom": "^18.2.0",

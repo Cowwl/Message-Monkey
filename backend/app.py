@@ -107,13 +107,16 @@ def handleMessage(
 def home():
     return "HOME"
 
+
 # Write a function to send a message to the user with the /sendmessage endpoint
 @app.route("/sendmessage", methods=["POST"])
 def sendMessage():
     # Get the sender ID and message from the request body
-    senderPsid = request.form["sender_id"]
-    messageText = request.form["message"]
-
+    # Print all fields of request
+    senderPsid = request.json["sender_id"]
+    print("[DEBUG] senderPsid: ", senderPsid)
+    messageText = request.json["message"]
+    print("[DEBUG] messageText: ", messageText)
     # Call the send message function
     response = {"text": messageText}
     callSendAPI(senderPsid, response)
@@ -131,6 +134,35 @@ def getMessages():
     # Print all the messages in the table
     messages = []
     for row in c.execute("SELECT * FROM messages"):
+        message = {
+            "sender_id": row[0],
+            "sender_first_name": row[1],
+            "sender_last_name": row[2],
+            "message_id": row[3],
+            "message": row[4],
+            "timestamp": row[5],
+        }
+        messages.append(message)
+
+    # Close the connection
+    conn.close()
+
+    return json.dumps(messages)
+
+
+# Write a function to return all messages for a sender with the /getmessagesforsender endpoint
+@app.route("/getmessagesforsender", methods=["POST"])
+def getMessagesForSender():
+    # Connect to the SQLite database
+    conn = sqlite3.connect("messages.db")
+    c = conn.cursor()
+
+    # Print all the messages in the table
+    messages = []
+    for row in c.execute(
+        "SELECT * FROM messages WHERE sender_id = :sender_id",
+        {"sender_id": request.json["sender_id"]},
+    ):
         message = {
             "sender_id": row[0],
             "sender_first_name": row[1],
@@ -266,13 +298,16 @@ def index():
             for entry in entries:
                 webhookEvent = entry["messaging"][0]
                 print(webhookEvent)
-
                 senderPsid = webhookEvent["sender"]["id"]
                 # Get the sender's full name from the Graph API
                 url = "https://graph.facebook.com/{}?fields=first_name,last_name&access_token={}".format(
                     senderPsid, config.PAGE_ACCESS_TOKEN
                 )
                 r = requests.get(url)
+                # if not a text message, ignore
+                if "text" not in webhookEvent["message"]:
+                    continue
+
                 senderFName = r.json()["first_name"]
                 senderLName = r.json()["last_name"]
                 messageid = webhookEvent["message"]["mid"]
