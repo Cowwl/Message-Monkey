@@ -49,6 +49,54 @@ const Dashboard = () => {
 
   return (
     <Div d="flex" h="100vh">
+      {/* Create a small left sidebar with a logout button at the bottom */}
+      <Div d="flex" flexDir="column" w="4%" h="100%" bg="#17486a" shadow="2">
+        {/* Button with icon for chat */}
+        <Button
+          bg="#17486a"
+          hoverShadow="4"
+          position="absolute"
+          top="0"
+          w="100%"
+          h="4rem"
+          rounded="0"
+        >
+          <Icon name="UserCircle" color="white" size="20px" />
+        </Button>
+        <Button
+          bg="#17486a"
+          hoverShadow="4"
+          position="absolute"
+          top="0"
+          w="100%"
+          h="4rem"
+          rounded="0"
+        >
+          <Icon name="Message" color="white" size="20px" />
+        </Button>
+        <Button
+          bg="#17486a"
+          hoverShadow="4"
+          position="absolute"
+          top="0"
+          w="100%"
+          h="4rem"
+          rounded="0"
+        >
+          <Icon name="Card" color="white" size="20px" />
+        </Button>
+        <Button
+          bg="#17486a"
+          hoverShadow="4"
+          position="relative"
+          bottom="0"
+          w="100%"
+          h="4rem"
+          rounded="0"
+        >
+          <Icon name="Logout" color="white" size="20px" />
+        </Button>
+      </Div>
       <Div
         d="flex"
         flexDir="column"
@@ -66,7 +114,7 @@ const Dashboard = () => {
           flexDir="row"
           align="center"
           justify="flex-start"
-          h="8%"
+          h="auto"
         >
           <Icon name="Menu" size="20px" m={{ r: "1rem" }} />
           <Text
@@ -74,11 +122,19 @@ const Dashboard = () => {
             textWeight="800"
             p="0.5rem"
             textAlign="center"
-            textColor="info700"
+            textColor="#17486a"
             textSize="title"
           >
             Conversations
           </Text>
+          <Button
+            bg="white"
+            hoverBg="gray200"
+            rounded="circle"
+            m={{ l: "auto" }}
+          >
+            <Icon name="Refresh" size="20px" m={{ l: "auto" }} />
+          </Button>
         </Div>
         {chats.map((chat, index) => (
           <Button
@@ -91,7 +147,7 @@ const Dashboard = () => {
             bg="white"
             textColor="black"
             hoverShadow="3"
-            hoverBg="info700"
+            hoverBg="#17486a"
             hoverTextColor="white"
           >
             {chat.name}
@@ -112,7 +168,7 @@ const Dashboard = () => {
             flexDir="row"
             justify="flex-start"
             p="1rem"
-            h="8%"
+            h="auto"
             bg="white"
             border={{ b: "0.5px solid" }}
             borderColor="gray500"
@@ -122,7 +178,7 @@ const Dashboard = () => {
             <Text
               m={{ l: "1rem" }}
               textAlign="flex-start"
-              textColor="info700"
+              textColor="#17486a"
               fontFamily="Poppins"
               textWeight="800"
               textSize="title"
@@ -130,7 +186,7 @@ const Dashboard = () => {
               {selectedChat?.name}
             </Text>
           </Div>
-          <Div p="1rem" flex="1">
+          <Div p="1rem" flex="1" h="100%">
             <Div overflowY="auto" overflowX="hidden" flex="1">
               {selectedChat?.messages.map((message, index) => (
                 <Div key={index} d="flex" flexDir="column" m={{ b: "1rem" }}>
@@ -138,7 +194,7 @@ const Dashboard = () => {
                   <Text
                     p={{ x: "0.5rem", y: "0.2rem" }}
                     textAlign={message.sender === "You" ? "right" : "left"}
-                    textColor={message.sender === "You" ? "info700" : "black"}
+                    textColor={message.sender === "You" ? "#17486a" : "black"}
                   >
                     {message.sender}
                   </Text>
@@ -156,7 +212,7 @@ const Dashboard = () => {
                       rounded="lg"
                       overflowWrap={"break-word"}
                       overflowX={"hidden"}
-                      bg={message.sender === "You" ? "info700" : "white"}
+                      bg={message.sender === "You" ? "#17486a" : "white"}
                       textColor={message.sender === "You" ? "white" : "black"}
                     >
                       {message.text}
@@ -166,7 +222,20 @@ const Dashboard = () => {
               ))}
             </Div>
           </Div>
-          <Div d="flex" flexDir="row" p="1rem" w="100%" justify="space-between">
+          {/* Pin this div to the bottom of the parent div */}
+          <Div
+            d="flex"
+            flexDir="row"
+            p="1rem"
+            w="100%"
+            position="absolute"
+            bottom="0"
+            justify="space-between"
+            bg="white"
+            border={{ t: "0.5px solid" }}
+            borderColor="gray500"
+            rounded="lg"
+          >
             <Input
               placeholder="Type a message..."
               w="100%"
@@ -232,8 +301,8 @@ const Dashboard = () => {
           {/* Add a call and profile icon side by side */}
           <Div d="flex" w="100%" justify="space-around">
             <Button
-              bg="info700"
-              hoverBg="info800"
+              bg="#17486a"
+              hoverBg="#00335d"
               textColor="white"
               shadow="3"
               hoverShadow="4"
@@ -245,8 +314,8 @@ const Dashboard = () => {
               Call
             </Button>
             <Button
-              bg="info700"
-              hoverBg="info800"
+              bg="#17486a"
+              hoverBg="#00335d"
               textColor="white"
               shadow="3"
               hoverShadow="4"
@@ -259,24 +328,62 @@ const Dashboard = () => {
             </Button>
           </Div>
         </Div>
+        {/* Text should be justified */}
         <Div d="flex" flexDir="column" align="center">
           <Div
-            bg="white"
-            m="1rem"
-            p="1rem"
+            d="flex"
+            border={{ b: "0.5px solid" }}
+            borderColor="gray500"
             shadow="2"
-            rounded="lg"
-            align="center"
-            justify="center"
+            h="auto"
+            flexDir="column"
+            p="1rem"
             w="90%"
+            rounded="lg"
+            m={{ t: "1rem" }}
+            bg="white"
           >
-            <Text p={{ y: "0.5rem" }} textAlign="center" textWeight="600">
+            <Text
+              fontFamily="Poppins"
+              textSize="subheader"
+              textWeight="800"
+              textAlign="justify"
+              textColor="#212121"
+              p="0.5rem"
+            >
               Customer Details
             </Text>
-            <Text p={{ y: "0.5rem" }} textAlign="center">
-              Name: {selectedChat?.name}
+            <Text
+              fontFamily="Poppins"
+              textSize="paragraph"
+              textWeight="400"
+              textAlign="justify"
+              textColor="#212121"
+              p="0.5rem"
+            >
+              {/* print name */}
+              First Name: {selectedChat?.name.split(" ")[0]}
             </Text>
-            <Text p={{ y: "0.5rem" }} textAlign="center">
+            <Text
+              fontFamily="Poppins"
+              textSize="paragraph"
+              textWeight="400"
+              textAlign="justify"
+              textColor="#212121"
+              p="0.5rem"
+            >
+              {/* print name */}
+              Last Name: {selectedChat?.name.split(" ")[1]}
+            </Text>
+            <Text
+              fontFamily="Poppins"
+              textSize="paragraph"
+              textWeight="400"
+              textAlign="justify"
+              textColor="#212121"
+              p="0.5rem"
+            >
+              {/* print email */}
               Email: {selectedChat?.email}
             </Text>
           </Div>
