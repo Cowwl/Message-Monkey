@@ -7,26 +7,25 @@ const Dashboard = () => {
   const [inputText, setInputText] = React.useState("");
   const [chats, setChats] = React.useState([]);
 
+  // Call the getsenders endpoint to get the list of senders then display them in the left sidebar. Display the same sender_id only once.
   React.useEffect(() => {
     axios
-      .get("https://f20202144-04ese3g34v1w0cji.socketxp.com/getmessages")
+      .get("https://f20202144-04ese3g34v1w0cji.socketxp.com/getsenders")
       .then((response) => {
-        const data = response.data;
+        // If the sender has the first name as "You", dont add it to chats
+        const data = response.data.filter(
+          (sender) => sender.sender_first_name !== "You"
+        );
         const formattedChats = data.map((chat) => ({
           name: `${chat.sender_first_name} ${chat.sender_last_name}`,
+          avatar: chat.sender_avatar,
           senderID: chat.sender_id,
-          avatar: `https://i.pravatar.cc/150?u=${chat.sender_id}`,
-          messages: [
-            {
-              sender: `${chat.sender_first_name} ${chat.sender_last_name}`,
-              text: chat.message,
-              timestamp: chat.timestamp,
-            },
-          ],
+          messages: [],
         }));
         setChats(formattedChats);
       });
   }, []);
+
   // Write a function to parse UTC epoch to a readable format
   const formatDate = (epoch) => {
     var date = new Date(epoch * 1000);
@@ -85,8 +84,12 @@ const Dashboard = () => {
         const data = response.data;
         const formattedChats = chats.map((chat) => {
           if (chat.senderID === senderID) {
+            // If the sender has first name as You, then add only "You" to the sender, otherwise add first name and last name
             chat.messages = data.map((message) => ({
-              sender: `${message.sender_first_name} ${message.sender_last_name}`,
+              sender:
+                message.sender_first_name === "You"
+                  ? "You"
+                  : `${message.sender_first_name} ${message.sender_last_name}`,
               text: message.message,
               timestamp: message.timestamp,
             }));
@@ -212,7 +215,7 @@ const Dashboard = () => {
         h="100%"
         bg="gray300"
       >
-        <Div d="flex" flexDir="column" h="100%">
+        <Div d="flex" flexDir="column" h="100%" overflowY="hidden">
           <Div
             d="flex"
             flexDir="row"
@@ -236,8 +239,8 @@ const Dashboard = () => {
               {selectedChat?.name}
             </Text>
           </Div>
-          <Div p="1rem" flex="1" h="100%">
-            <Div overflowY="auto" overflowX="hidden" flex="1">
+          <Div p="1rem" flex="1" h="100%" overflow="scroll">
+            <Div overflowY="scroll" overflowX="hidden" flex="1">
               {selectedChat?.messages.map((message, index) => (
                 <Div key={index} d="flex" flexDir="column" m={{ b: "1rem" }}>
                   {/* handle overflow in the chat bubble */}
@@ -274,7 +277,7 @@ const Dashboard = () => {
                     textAlign={message.sender === "You" ? "right" : "left"}
                     textColor={message.sender === "You" ? "#17486a" : "black"}
                   >
-                    {formatDate(message.timestamp/1000)}
+                    {message.sender === "You" ?  formatDate(message.timestamp / 1000000) : formatDate(message.timestamp / 1000)}
                   </Text>
                 </Div>
               ))}

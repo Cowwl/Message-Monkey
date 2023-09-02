@@ -3,11 +3,12 @@ import requests
 import json
 import config
 import sqlite3
+import random
 
 app = Flask(__name__)
 app.config[
     "SECRET_KEY"
-] = "EAALcCg4esI4BO5ZBVu3AqelB2wUui3yvLCRYXlN3la0nAqLKPgkWQNABjuo9OkDsShxXLbZCV1MvNtmahl5ZBKzTis02ICegPHXAYtU5cxGNtL9O3aZCME1oGuB1juuqS19YXuGJQKZBIPbAGEEVOEVqSZCzkkO3vlVjZA9Goyi3myNsCUJ4VZCTfqcFJwPJmJeMGLVZBUixglwmzyRE09QZDZD"
+] = "EAAUwFBsMTFABOyyfmb4gBlpl6HZArCR8ZC83PFbbrxVMp4tVMpehIz7e8LZCTip51E473H1ytocaE6ZA83ZA6TJzwTr3ZAfQJfvrdZCqe5UskECjFzXDZBsEIo4AetUqlrBy2mSlPYZAn6mSPxUdfmo5C1ZB1cOPHuZC0jgRrlbmgsXZBsGEwAn6Se3WJUu4P50A7OtLZCgiF5w8vwaUKQS9y1wZDZD"
 
 
 # Write CORS headers to allow cross origin requests
@@ -105,49 +106,84 @@ def handleMessage(
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+    # create the two tables in the database
+    conn = sqlite3.connect("messages.db")
+    c = conn.cursor()
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS messages (
+        sender_id text,
+        sender_first_name text,
+        sender_last_name text,
+        message_id text,
+        message text,
+        timestamp text
+        )"""
+    )
+    conn.commit()
+    conn.close()
     return "HOME"
 
 
-# Write a function to send a message to the user with the /sendmessage endpoint
+# Write a function to send a message to the user with the /sendmessage endpoint and store the message in the database in a new table
 @app.route("/sendmessage", methods=["POST"])
 def sendMessage():
-    # Get the sender ID and message from the request body
+    # Get the sender ID and message and timestamp from the request
     # Print all fields of request
     senderPsid = request.json["sender_id"]
     print("[DEBUG] senderPsid: ", senderPsid)
     messageText = request.json["message"]
     print("[DEBUG] messageText: ", messageText)
     # Call the send message function
+    timestamp = request.json["timestamp"]
+    print("[DEBUG] timestamp: ", timestamp)
+    # Connect to the SQLite database
+    conn = sqlite3.connect("messages.db")
+    c = conn.cursor()
+    # generate a random message id
+    mid = "m" + str(random.randint(1000000000, 9999999999))
+    # Insert the message into the table
+    c.execute(
+        "INSERT INTO messages VALUES (:sender_id, :sender_first_name, :sender_last_name, :message_id, :message, :timestamp)",
+        {
+            "sender_id": senderPsid,
+            "sender_first_name": "You",
+            "sender_last_name": "You",
+            "message_id": mid,
+            "message": messageText,
+            "timestamp": timestamp,
+        },
+    )
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
     response = {"text": messageText}
     callSendAPI(senderPsid, response)
 
     return "Message sent successfully"
 
 
-# Write a function to get the messages from the database and return them as a JSON response with the /getmessages endpoint
-@app.route("/getmessages", methods=["GET"])
-def getMessages():
+# Write a function to get the list of senders with their full names with the /getsenders endpoint
+@app.route("/getsenders", methods=["GET"])
+def getSenders():
     # Connect to the SQLite database
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
 
     # Print all the messages in the table
-    messages = []
+    senders = []
     for row in c.execute("SELECT * FROM messages"):
-        message = {
+        sender = {
             "sender_id": row[0],
             "sender_first_name": row[1],
             "sender_last_name": row[2],
-            "message_id": row[3],
-            "message": row[4],
-            "timestamp": row[5],
         }
-        messages.append(message)
+        if sender not in senders:
+            senders.append(sender)
 
     # Close the connection
     conn.close()
 
-    return json.dumps(messages)
+    return json.dumps(senders)
 
 
 # Write a function to return all messages for a sender with the /getmessagesforsender endpoint
@@ -159,25 +195,22 @@ def getMessagesForSender():
 
     # Print all the messages in the table
     messages = []
-    for row in c.execute(
-        "SELECT * FROM messages WHERE sender_id = :sender_id",
-        {"sender_id": request.json["sender_id"]},
-    ):
-        message = {
-            "sender_id": row[0],
-            "sender_first_name": row[1],
-            "sender_last_name": row[2],
-            "message_id": row[3],
-            "message": row[4],
-            "timestamp": row[5],
-        }
-        messages.append(message)
+    for row in c.execute("SELECT * FROM messages"):
+        if row[0] == request.json["sender_id"]:
+            message = {
+                "sender_id": row[0],
+                "sender_first_name": row[1],
+                "sender_last_name": row[2],
+                "message_id": row[3],
+                "message": row[4],
+                "timestamp": row[5],
+            }
+            messages.append(message)
 
     # Close the connection
     conn.close()
 
     return json.dumps(messages)
-
 
 # Write a fucntion to handle registrations and create a new database and put name email and password in it
 @app.route("/register", methods=["POST"])
