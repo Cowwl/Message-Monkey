@@ -1,15 +1,38 @@
 import React, { useState } from "react";
-import FacebookLogin from "react-facebook-login";
-import { Div, Text, Button } from "atomize";
+import { useNavigate } from "react-router-dom";
+import { Div, Text, Input, Button } from "atomize";
+import axios from "axios";
 
-const LandingPage = () => {
-  const [fbData, setFbData] = useState(null);
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const responseFacebook = (response) => {
-    // handle response from Facebook
-    setFbData(response);
-    // post api secret key for messenger to the backend
-    // ...
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const params = new URLSearchParams();
+    params.append("email", email);
+    params.append("password", password);
+
+    const response = await axios.post(
+      "https://f20202144-04ese3g34v1w0cji.socketxp.com/login",
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const data = response.data;
+
+    if (data === "User logged in successfully") {
+      navigate("/LandingPage");
+    } else {
+      setError("Login failed. Check your email and password.");
+    }
   };
 
   return (
@@ -35,26 +58,45 @@ const LandingPage = () => {
           m={{ b: "1rem" }}
           textAlign="center"
         >
-          Landing Page
+          Login
         </Text>
-        {!fbData ? (
-          <FacebookLogin
-            appId="804885698097294"
-            autoLoad={true}
-            fields="name,email,picture"
-            callback={responseFacebook}
-          />
-        ) : (
-          <Div>
-            <Text tag="h2" textSize="heading">
-              Welcome, {fbData.name}!
-            </Text>
-            <Text>Connected to Facebook Business Page: ...</Text>
+        <form onSubmit={handleSubmit}>
+          <Div w={{ xs: "90%", md: "25rem" }} m={{ b: "1rem" }}>
+            <Input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Div>
-        )}
+          <Div w={{ xs: "90%", md: "25rem" }} m={{ b: "1rem" }}>
+            <Input
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Div>
+          {error && <div>{error}</div>}
+          <Button
+            w={{ xs: "90%", md: "25rem" }}
+            rounded="lg"
+            shadow="3"
+            fontFamily="Poppins"
+            hoverShadow="4"
+            m={{ t: "1rem" }}
+            bg="info700"
+            hoverBg="info800"
+            textColor="white"
+          >
+            Login
+          </Button>
+        </form>
+        <div style={{ marginTop: "1rem" }}>
+          Don't have an account? <a href="/register">Register</a>
+        </div>
       </Div>
     </Div>
   );
 };
 
-export default LandingPage;
+export default Login;

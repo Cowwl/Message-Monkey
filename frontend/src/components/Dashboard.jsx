@@ -61,7 +61,7 @@ const Dashboard = () => {
               chat.messages.push({
                 sender: "You",
                 text: inputText,
-                timestamp: Math.floor(Date.now()),
+                timestamp: Math.floor(Date.now() * 1000),
               });
             }
             return chat;
@@ -145,6 +145,10 @@ const Dashboard = () => {
           w="100%"
           h="4rem"
           rounded="0"
+          onClick={() => {
+            // navigate to the landing page
+            window.location.href = "/LandingPage";
+          }}
         >
           <Icon name="Logout" color="white" size="20px" />
         </Button>
@@ -277,7 +281,9 @@ const Dashboard = () => {
                     textAlign={message.sender === "You" ? "right" : "left"}
                     textColor={message.sender === "You" ? "#17486a" : "black"}
                   >
-                    {message.sender === "You" ?  formatDate(message.timestamp / 1000000) : formatDate(message.timestamp / 1000)}
+                    {message.sender === "You"
+                      ? formatDate(message.timestamp / 1000000)
+                      : formatDate(message.timestamp / 1000)}
                   </Text>
                 </Div>
               ))}

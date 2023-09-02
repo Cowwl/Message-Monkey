@@ -4,12 +4,9 @@ import json
 import config
 import sqlite3
 import random
+import facebook
 
 app = Flask(__name__)
-app.config[
-    "SECRET_KEY"
-] = "EAAUwFBsMTFABOyyfmb4gBlpl6HZArCR8ZC83PFbbrxVMp4tVMpehIz7e8LZCTip51E473H1ytocaE6ZA83ZA6TJzwTr3ZAfQJfvrdZCqe5UskECjFzXDZBsEIo4AetUqlrBy2mSlPYZAn6mSPxUdfmo5C1ZB1cOPHuZC0jgRrlbmgsXZBsGEwAn6Se3WJUu4P50A7OtLZCgiF5w8vwaUKQS9y1wZDZD"
-
 
 # Write CORS headers to allow cross origin requests
 @app.after_request
@@ -62,8 +59,8 @@ def handleMessage(
 ):
     # check if received message contains text
     if "text" in receivedMessage:
-        response = {"text": "You just sent: {}".format(receivedMessage["text"])}
-        callSendAPI(senderPsid, response)
+        # response = {"text": "You just sent: {}".format(receivedMessage["text"])}
+        # callSendAPI(senderPsid, response)
 
         # Connect to the SQLite database
         conn = sqlite3.connect("messages.db")
@@ -80,7 +77,14 @@ def handleMessage(
             timestamp text
             )"""
         )
-
+        # Make sender_id and message_id unique
+        c.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx ON messages(sender_id, message_id)"
+        )
+        # if duplicate message id, ignore
+        c.execute("SELECT * FROM messages WHERE message_id=?", (messageId,))
+        if c.fetchone() is not None:
+            return
         # Insert the message into the table
         c.execute(
             "INSERT INTO messages VALUES (:sender_id, :sender_first_name, :sender_last_name, :message_id, :message, :timestamp)",
@@ -102,6 +106,17 @@ def handleMessage(
     else:
         response = {"text": "This chatbot only accepts text messages"}
         callSendAPI(senderPsid, response)
+
+
+# Write a function which takes the page access token and sets it to the config file
+@app.route("/setaccesstoken", methods=["POST"])
+def setAccessToken():
+    config.PAGE_ACCESS_TOKEN = request.json["accessToken"]
+    # Also overwrite the config file
+    with open("config.py", "w") as f:
+        f.write("PAGE_ACCESS_TOKEN = " + '"' + config.PAGE_ACCESS_TOKEN + '"')
+    # also do webhook setup using the index function
+    return "Page access token set successfully"
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -211,6 +226,7 @@ def getMessagesForSender():
     conn.close()
 
     return json.dumps(messages)
+
 
 # Write a fucntion to handle registrations and create a new database and put name email and password in it
 @app.route("/register", methods=["POST"])
