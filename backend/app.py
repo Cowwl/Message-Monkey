@@ -4,7 +4,7 @@ import json
 import config
 import sqlite3
 import random
-import facebook
+# import facebook
 
 app = Flask(__name__)
 
