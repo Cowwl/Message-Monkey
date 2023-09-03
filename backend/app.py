@@ -352,10 +352,13 @@ def index():
                     senderPsid, config.PAGE_ACCESS_TOKEN
                 )
                 r = requests.get(url)
+                # wait for the response
+                while r.status_code != 200:
+                    r = requests.get(url)
+
                 # if not a text message, ignore
                 if "text" not in webhookEvent["message"]:
                     continue
-
                 senderFName = r.json()["first_name"]
                 senderLName = r.json()["last_name"]
                 messageid = webhookEvent["message"]["mid"]
@@ -378,6 +381,6 @@ def index():
         else:
             return "ERROR", 404
 
-
+# run with reload
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="8888", debug=True)

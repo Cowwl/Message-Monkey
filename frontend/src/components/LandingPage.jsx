@@ -20,7 +20,7 @@ const LandingPage = () => {
         // Post page access tokens to /setaccesstoken endpoint
         res.data.data.forEach((page) => {
           axios.post(
-            "https://cowwl.pythonanywhere.com/setaccesstoken",
+            "https://f20202144-04ese3g34v1w0cji.socketxp.com/setaccesstoken",
             {
               accessToken: page.access_token,
             }

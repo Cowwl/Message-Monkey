@@ -11,7 +11,7 @@ const Register = () => {
     event.preventDefault();
     try {
       const response = await axios.post(
-        "https://cowwl.pythonanywhere.com/register",
+        "https://f20202144-04ese3g34v1w0cji.socketxp.com/register",
         new URLSearchParams({
           name,
           email,
