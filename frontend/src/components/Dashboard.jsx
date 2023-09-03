@@ -10,7 +10,7 @@ const Dashboard = () => {
   // Call the getsenders endpoint to get the list of senders then display them in the left sidebar. Display the same sender_id only once.
   React.useEffect(() => {
     axios
-      .get("https://f20202144-04ese3g34v1w0cji.socketxp.com/getsenders")
+      .get("https://cowwl.pythonanywhere.com/getsenders")
       .then((response) => {
         // If the sender has the first name as "You", dont add it to chats
         const data = response.data.filter(
@@ -49,7 +49,7 @@ const Dashboard = () => {
   const handleSendMessage = () => {
     if (inputText !== "") {
       axios
-        .post("https://f20202144-04ese3g34v1w0cji.socketxp.com/sendmessage", {
+        .post("https://cowwl.pythonanywhere.com/sendmessage", {
           sender_id: selectedChat.senderID,
           message: inputText,
           timestamp: Math.floor(Date.now() * 1000),
@@ -75,7 +75,7 @@ const Dashboard = () => {
   const getMessagesFromID = (senderID) => {
     axios
       .post(
-        "https://f20202144-04ese3g34v1w0cji.socketxp.com/getmessagesforsender",
+        "https://cowwl.pythonanywhere.com/getmessagesforsender",
         {
           sender_id: senderID,
         }

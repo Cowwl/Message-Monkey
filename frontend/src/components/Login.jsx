@@ -17,7 +17,7 @@ const Login = () => {
     params.append("password", password);
 
     const response = await axios.post(
-      "https://f20202144-04ese3g34v1w0cji.socketxp.com/login",
+      "https://cowwl.pythonanywhere.com/login",
       params,
       {
         headers: {
