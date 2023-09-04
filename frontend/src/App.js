@@ -5,11 +5,13 @@ import Register from "./components/Register";
 import NotFound from "./components/NotFound";
 import LandingPage from "./components/LandingPage";
 import Dashboard from "./components/Dashboard";
+
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/" element={<Login />} /> {/* Default route */}
           <Route path="/login" element={<Login />} />
           <Route path="/LandingPage" element={<LandingPage />} />
           <Route path="/register" element={<Register />} />
