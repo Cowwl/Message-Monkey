@@ -1,6 +1,6 @@
 # Facebook Chatbot Using Flask and React
 
-This is a simple chatbot application built using Flask as the backend API and React for the frontend UI. It allows for chatting with Facebook users and storing the conversation history in a database.
+This is a simple chatbot application built using Flask as the backend API and React for the frontend UI. It allows for chatting with Facebook users and storing the conversation history in a database. This was more of an experiment of how much I could create under 48 hours, so don't expect it to be polished.
 
 ## Features
 
